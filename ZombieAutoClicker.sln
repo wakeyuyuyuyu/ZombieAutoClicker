@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11619.145 insiders
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZombieAutoClicker", "ZombieAutoClicker\ZombieAutoClicker.csproj", "{805FE839-794C-4F28-89C4-30D9D75300FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{805FE839-794C-4F28-89C4-30D9D75300FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{805FE839-794C-4F28-89C4-30D9D75300FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{805FE839-794C-4F28-89C4-30D9D75300FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{805FE839-794C-4F28-89C4-30D9D75300FE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B912B2CF-4FAB-4394-892B-6DC8028F600A}
+	EndGlobalSection
+EndGlobal
