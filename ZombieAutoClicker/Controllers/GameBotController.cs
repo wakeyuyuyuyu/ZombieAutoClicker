@@ -103,6 +103,9 @@ namespace ZombieAutoClicker.Controllers
                     continue;
                 }
 
+                // 为了实时显示OCR结果，无论在哪个阶段，都先对整个画面进行一次文字识别
+                FindTargetCenter(screen, null);
+
                 if (isPhase1)
                 {
                     // ==========================================
@@ -114,7 +117,7 @@ namespace ZombieAutoClicker.Controllers
                     if (pos.HasValue)
                     {
                         _logCallback($"[阶段1-按顺序进图] 发现目标【{target}】，正在点击... ({currentStep1Index + 1}/{_step1Texts.Length})");
-                        ClickPoint(pos.Value, winTopLeft);
+                        // ClickPoint(pos.Value, winTopLeft);
 
                         // 步数+1
                         currentStep1Index++;
@@ -150,7 +153,7 @@ namespace ZombieAutoClicker.Controllers
                         if (pos.HasValue)
                         {
                             _logCallback($"[阶段2-战斗循环] 发现目标【{target}】，正在点击...");
-                            ClickPoint(pos.Value, winTopLeft);
+                            // ClickPoint(pos.Value, winTopLeft);
                             actionTakenThisLoop = true;
 
                             Thread.Sleep(1500);
@@ -191,6 +194,12 @@ namespace ZombieAutoClicker.Controllers
         /// </summary>
         private Point? FindTargetCenter(Bitmap screen, string target)
         {
+            // 如果为空，说明是纯粹的屏幕全局识别（用于 UI 实时显示 OCR 框），不需要去判断后缀名
+            if (string.IsNullOrEmpty(target))
+            {
+                return VisionService.FindTextCenter(screen, null);
+            }
+
             if (target.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
                 target.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
             {
@@ -206,7 +215,7 @@ namespace ZombieAutoClicker.Controllers
                 }
 
                 // 如果文件存在，调用高精度图像匹配
-                return VisionService.FindImageCenter(screen, fullPath);
+                return VisionService.FindTextCenter(screen, System.IO.Path.GetFileNameWithoutExtension(fullPath));
             }
             else
             {

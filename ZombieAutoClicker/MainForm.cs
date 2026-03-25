@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using ZombieAutoClicker.Controllers;
+using ZombieAutoClicker.Services;
 
 namespace ZombieAutoClicker
 {
@@ -12,6 +13,7 @@ namespace ZombieAutoClicker
         private Button btnStop;
         private RichTextBox rtbLog;
         private GameBotController bot;
+        private OverlayForm _overlayForm;
 
         public MainForm()
         {
@@ -26,6 +28,19 @@ namespace ZombieAutoClicker
                 else
                     UpdateLog(msg);
             });
+
+            // 3. 初始化并显示悬浮窗
+            _overlayForm = new OverlayForm();
+            _overlayForm.Show();
+
+            // 4. 订阅OCR识别事件，用于在悬浮窗上显示结果
+            VisionService.OnOcrResult += (result) =>
+            {
+                if (!_overlayForm.IsDisposed)
+                {
+                    _overlayForm.BeginInvoke(new Action(() => _overlayForm.UpdateOcrResult(result)));
+                }
+            };
         }
 
         private void UpdateLog(string msg)
