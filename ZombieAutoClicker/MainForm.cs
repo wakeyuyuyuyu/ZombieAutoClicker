@@ -19,6 +19,7 @@ namespace ZombieAutoClicker
         {
             // 1. 初始化界面所有控件
             InitializeUI();
+            this.FormClosing += MainForm_FormClosing;
 
             // 2. 初始化挂机大脑（与 Canvas 中的 GameBotController 绑定）
             bot = new GameBotController(msg =>
@@ -62,6 +63,18 @@ namespace ZombieAutoClicker
             bot.Stop();
             btnStart.Enabled = true;
             btnStop.Enabled = false;
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Stop the bot to ensure all background tasks are terminated
+            bot.Stop();
+
+            // Close the overlay form
+            if (_overlayForm != null && !_overlayForm.IsDisposed)
+            {
+                _overlayForm.Close();
+            }
         }
 
         // --- 核心：纯代码生成所有 UI 控件 ---

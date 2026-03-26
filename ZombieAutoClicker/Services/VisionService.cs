@@ -40,8 +40,11 @@ namespace ZombieAutoClicker.Services
 
             try
             {
+                Console.WriteLine("[VisionService] Initializing OCR Engine...");
                 InitOcrEngine();
+                Console.WriteLine("[VisionService] OCR Engine Initialized. Detecting text...");
                 OCRResult ocrResult = _ocrEngine.DetectText(screenBmp);
+                Console.WriteLine($"[VisionService] Text detection complete. Result is null: {ocrResult == null}");
 
                 // 触发事件，将原始识别结果广播出去，用于屏幕显示
                 OnOcrResult?.Invoke(ocrResult);
@@ -71,8 +74,9 @@ namespace ZombieAutoClicker.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"[VisionService] FATAL ERROR during text detection: {ex.Message}\n{ex.StackTrace}");
                 return null;
             }
 

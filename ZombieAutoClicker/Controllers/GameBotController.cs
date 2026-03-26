@@ -31,7 +31,7 @@ namespace ZombieAutoClicker.Controllers
         // 数组 2：阶段2 (战斗循环阶段)
         // 同样支持图文混合，如果是图片请务必以 .png 结尾
         // ==========================================
-        private readonly string[] _step2Texts = { "温压弹", "干冰弹", "确定", "下一层", "跳过" };
+        private readonly string[] _step2Texts = { "温压弹", "干冰弹", "确定", "下一层", "跳过","返回主界面" };
 
 
         public GameBotController(Action<string> logger)
@@ -104,7 +104,7 @@ namespace ZombieAutoClicker.Controllers
                 }
 
                 // 为了实时显示OCR结果，无论在哪个阶段，都先对整个画面进行一次文字识别
-                FindTargetCenter(screen, null);
+                VisionService.FindTextCenter(screen, null);
 
                 if (isPhase1)
                 {
@@ -200,28 +200,7 @@ namespace ZombieAutoClicker.Controllers
                 return VisionService.FindTextCenter(screen, null);
             }
 
-            if (target.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                target.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
-            {
-                // 【核心修复】将相对路径转换为 exe 所在目录的绝对路径，彻底避免工作目录偏移问题
-                string fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, target);
-
-                // 增加防呆检测：判断文件是否真实存在
-                if (!System.IO.File.Exists(fullPath))
-                {
-                    // 打印出完整的绝对路径，方便排错
-                    _logCallback($"[报错] 找不到图片物理文件，请把图片放到这里：\n{fullPath}");
-                    return null;
-                }
-
-                // 如果文件存在，调用高精度图像匹配
-                return VisionService.FindTextCenter(screen, System.IO.Path.GetFileNameWithoutExtension(fullPath));
-            }
-            else
-            {
-                // 否则调用原生 OCR 文字识别
-                return VisionService.FindTextCenter(screen, target);
-            }
+            return VisionService.FindTextCenter(screen, target);
         }
 
         /// <summary>

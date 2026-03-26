@@ -1,6 +1,6 @@
+using PaddleOCRSharp;
 using System.Drawing;
 using System.Windows.Forms;
-using PaddleOCRSharp;
 
 namespace ZombieAutoClicker
 {
@@ -28,6 +28,7 @@ namespace ZombieAutoClicker
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
+            e.Graphics.Clear(this.BackColor);
 
             if (_ocrResult == null || _ocrResult.TextBlocks == null) return;
 
