@@ -6,7 +6,7 @@ namespace ZombieAutoClicker
 {
     public partial class OverlayForm : Form
     {
-        private VisionOCRResult _ocrResult;
+        private VisionOCRResult? _ocrResult;
 
         public OverlayForm()
         {
@@ -19,7 +19,7 @@ namespace ZombieAutoClicker
             this.DoubleBuffered = true;
         }
 
-        public void UpdateOcrResult(VisionOCRResult ocrResult)
+        public void UpdateOcrResult(VisionOCRResult? ocrResult)
         {
             _ocrResult = ocrResult;
             this.Invalidate(); // Triggers the Paint event
@@ -51,7 +51,7 @@ namespace ZombieAutoClicker
                         g.DrawPolygon(redPen, points);
 
                         // Draw text label
-                        string displayText = block.Text;
+                        string? displayText = block.Text;
                         if (!string.IsNullOrEmpty(displayText))
                         {
                             Point textPoint = new Point(points[0].X, points[0].Y - 20);

@@ -13,7 +13,7 @@ namespace ZombieAutoClicker.Modules.WindowControl
     public class WindowsWindowService : IWindowService
     {
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        private static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -51,7 +51,7 @@ namespace ZombieAutoClicker.Modules.WindowControl
         /// <summary>
         /// 截取指定窗口的画面
         /// </summary>
-        public Bitmap CaptureWindow(string windowTitle, out Point windowTopLeft)
+        public Bitmap? CaptureWindow(string windowTitle, out Point windowTopLeft)
         {
             windowTopLeft = Point.Empty;
             IntPtr hWnd = FindWindow(null, windowTitle);

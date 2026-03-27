@@ -18,14 +18,14 @@ namespace ZombieAutoClicker.Modules.Vision
         /// <summary>
         /// OCR识别结果事件
         /// </summary>
-        public event Action<VisionOCRResult> OnOcrResult;
+        public event Action<VisionOCRResult>? OnOcrResult;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         public CompositeVisionService()
         {
-            OCRModelConfig config = null;
+            OCRModelConfig? config = null;
             OCRParameter ocrParameter = new OCRParameter();
             _ocrEngine = new PaddleOCREngine(config, ocrParameter);
         }
@@ -48,7 +48,7 @@ namespace ZombieAutoClicker.Modules.Vision
             }
 
             // 根据文件扩展名判断识别类型
-            string extension = Path.GetExtension(target)?.ToLower();
+            string? extension = Path.GetExtension(target)?.ToLower();
             bool isImageFile = extension == ".png" || extension == ".jpg" || extension == ".jpeg";
 
             if (isImageFile)
@@ -76,7 +76,11 @@ namespace ZombieAutoClicker.Modules.Vision
                 lock (_lock)
                 {
                     var paddleResult = _ocrEngine.DetectText(screenBmp);
-                    OnOcrResult?.Invoke(ConvertToCustomOCRResult(paddleResult));
+                    var customResult = ConvertToCustomOCRResult(paddleResult);
+                    if (customResult != null)
+                    {
+                        OnOcrResult?.Invoke(customResult);
+                    }
                 }
             }
             catch (Exception ex)
@@ -95,7 +99,11 @@ namespace ZombieAutoClicker.Modules.Vision
                 lock (_lock)
                 {
                     var paddleResult = _ocrEngine.DetectText(screenBmp);
-                    OnOcrResult?.Invoke(ConvertToCustomOCRResult(paddleResult));
+                    var customResult = ConvertToCustomOCRResult(paddleResult);
+                    if (customResult != null)
+                    {
+                        OnOcrResult?.Invoke(customResult);
+                    }
 
                     if (paddleResult != null && paddleResult.TextBlocks != null)
                     {
@@ -127,7 +135,7 @@ namespace ZombieAutoClicker.Modules.Vision
         /// <summary>
         /// 转换PaddleOCR结果到自定义格式
         /// </summary>
-        private VisionOCRResult ConvertToCustomOCRResult(PaddleOCRSharp.OCRResult paddleResult)
+        private VisionOCRResult? ConvertToCustomOCRResult(PaddleOCRSharp.OCRResult? paddleResult)
         {
             if (paddleResult == null) return null;
 

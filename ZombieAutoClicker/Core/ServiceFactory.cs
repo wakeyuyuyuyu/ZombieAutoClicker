@@ -10,8 +10,8 @@ namespace ZombieAutoClicker.Core
     /// </summary>
     public static class ServiceFactory
     {
-        private static IVisionService _visionService;
-        private static IWindowService _windowService;
+        private static IVisionService? _visionService;
+        private static IWindowService? _windowService;
 
         /// <summary>
         /// 获取视觉识别服务实例
@@ -22,7 +22,7 @@ namespace ZombieAutoClicker.Core
             {
                 _visionService = new CompositeVisionService();
             }
-            return _visionService;
+            return _visionService!;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace ZombieAutoClicker.Core
             {
                 _windowService = new WindowsWindowService();
             }
-            return _windowService;
+            return _windowService!;
         }
 
         /// <summary>

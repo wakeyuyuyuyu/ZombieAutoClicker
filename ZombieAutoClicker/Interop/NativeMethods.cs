@@ -11,7 +11,7 @@ namespace ZombieAutoClicker.Interop
     internal static class NativeMethods
     {
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        public static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -41,7 +41,7 @@ namespace ZombieAutoClicker.Interop
         /// <summary>
         /// 截取指定标题的窗口画面
         /// </summary>
-        public static Bitmap CaptureWindow(string windowTitle, out Point windowTopLeft)
+        public static Bitmap? CaptureWindow(string windowTitle, out Point windowTopLeft)
         {
             windowTopLeft = Point.Empty;
             IntPtr hWnd = FindWindow(null, windowTitle);

@@ -116,7 +116,7 @@ namespace ZombieAutoClicker.Controllers
                 }
 
                 // 2. 截取当前屏幕画面
-                Bitmap screen = _windowService.CaptureWindow(_windowTitle, out Point winTopLeft);
+                Bitmap? screen = _windowService.CaptureWindow(_windowTitle, out Point winTopLeft);
                 if (screen == null)
                 {
                     Thread.Sleep(2000);

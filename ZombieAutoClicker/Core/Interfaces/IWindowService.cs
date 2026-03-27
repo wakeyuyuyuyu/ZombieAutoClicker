@@ -21,7 +21,7 @@ namespace ZombieAutoClicker.Core.Interfaces
         /// <param name="windowTitle">窗口标题</param>
         /// <param name="windowTopLeft">窗口左上角坐标</param>
         /// <returns>窗口截图</returns>
-        Bitmap CaptureWindow(string windowTitle, out Point windowTopLeft);
+        Bitmap? CaptureWindow(string windowTitle, out Point windowTopLeft);
 
         /// <summary>
         /// 模拟鼠标左键点击绝对坐标

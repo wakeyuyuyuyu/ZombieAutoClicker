@@ -34,7 +34,7 @@ namespace ZombieAutoClicker.Core.Interfaces
     /// </summary>
     public class VisionOCRResult
     {
-        public VisionOCRTextBlock[] TextBlocks { get; set; }
+        public VisionOCRTextBlock[]? TextBlocks { get; set; }
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ namespace ZombieAutoClicker.Core.Interfaces
     /// </summary>
     public class VisionOCRTextBlock
     {
-        public string Text { get; set; }
-        public Point[] BoxPoints { get; set; }
+        public string? Text { get; set; }
+        public Point[]? BoxPoints { get; set; }
     }
 }
