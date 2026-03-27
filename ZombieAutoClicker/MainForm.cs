@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using ZombieAutoClicker.Controllers;
-using ZombieAutoClicker.Services;
+using ZombieAutoClicker.Core;
+using ZombieAutoClicker.Core.Interfaces;
 
 namespace ZombieAutoClicker
 {
@@ -12,8 +12,9 @@ namespace ZombieAutoClicker
         private Button btnStart;
         private Button btnStop;
         private RichTextBox rtbLog;
-        private GameBotController bot;
+        private IGameBotController bot;
         private OverlayForm _overlayForm;
+        private IVisionService _visionService;
 
         public MainForm()
         {
@@ -21,8 +22,11 @@ namespace ZombieAutoClicker
             InitializeUI();
             this.FormClosing += MainForm_FormClosing;
 
-            // 2. 初始化挂机大脑（与 Canvas 中的 GameBotController 绑定）
-            bot = new GameBotController(msg =>
+            // 2. 获取视觉识别服务实例
+            _visionService = ServiceFactory.GetVisionService();
+
+            // 3. 初始化挂机大脑（使用服务工厂创建）
+            bot = ServiceFactory.CreateGameBotController(msg =>
             {
                 if (rtbLog.InvokeRequired)
                     rtbLog.Invoke(new Action(() => UpdateLog(msg)));
@@ -30,12 +34,12 @@ namespace ZombieAutoClicker
                     UpdateLog(msg);
             });
 
-            // 3. 初始化并显示悬浮窗
+            // 4. 初始化并显示悬浮窗
             _overlayForm = new OverlayForm();
             _overlayForm.Show();
 
-            // 4. 订阅OCR识别事件，用于在悬浮窗上显示结果
-            VisionService.OnOcrResult += (result) =>
+            // 5. 订阅OCR识别事件，用于在悬浮窗上显示结果
+            _visionService.OnOcrResult += (result) =>
             {
                 if (!_overlayForm.IsDisposed)
                 {
@@ -82,7 +86,7 @@ namespace ZombieAutoClicker
         // --- 核心：纯代码生成所有 UI 控件 ---
         private void InitializeUI()
         {
-            this.Text = "向僵尸开炮 RPA自动化助手 v1.1";
+            this.Text = "自动化助手 v1.1";
 
             // 【修改点1】大幅增加了窗口的初始大小为 800x600
             this.Size = new Size(800, 600);

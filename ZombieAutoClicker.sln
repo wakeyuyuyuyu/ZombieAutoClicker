@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 18
-VisualStudioVersion = 18.5.11619.145
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36623.8 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZombieAutoClicker", "ZombieAutoClicker\ZombieAutoClicker.csproj", "{805FE839-794C-4F28-89C4-30D9D75300FE}"
 EndProject

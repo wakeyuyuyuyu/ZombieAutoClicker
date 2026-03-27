@@ -1,12 +1,12 @@
-using PaddleOCRSharp;
 using System.Drawing;
 using System.Windows.Forms;
+using ZombieAutoClicker.Core.Interfaces;
 
 namespace ZombieAutoClicker
 {
     public partial class OverlayForm : Form
     {
-        private OCRResult _ocrResult;
+        private VisionOCRResult _ocrResult;
 
         public OverlayForm()
         {
@@ -19,7 +19,7 @@ namespace ZombieAutoClicker
             this.DoubleBuffered = true;
         }
 
-        public void UpdateOcrResult(OCRResult ocrResult)
+        public void UpdateOcrResult(VisionOCRResult ocrResult)
         {
             _ocrResult = ocrResult;
             this.Invalidate(); // Triggers the Paint event
@@ -40,7 +40,7 @@ namespace ZombieAutoClicker
             {
                 foreach (var block in _ocrResult.TextBlocks)
                 {
-                    if (block.BoxPoints != null && block.BoxPoints.Count >= 4)
+                    if (block.BoxPoints != null && block.BoxPoints.Length >= 4)
                     {
                         // Draw bounding box
                         Point[] points = new Point[4];
@@ -50,8 +50,13 @@ namespace ZombieAutoClicker
                         }
                         g.DrawPolygon(redPen, points);
 
-                        // Draw text
-                        g.DrawString(block.Text, drawFont, drawBrush, points[0]);
+                        // Draw text label
+                        string displayText = block.Text;
+                        if (!string.IsNullOrEmpty(displayText))
+                        {
+                            Point textPoint = new Point(points[0].X, points[0].Y - 20);
+                            g.DrawString(displayText, drawFont, drawBrush, textPoint);
+                        }
                     }
                 }
             }

@@ -11,10 +11,29 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260222" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260222" />
-    <PackageReference Include="Paddle.Runtime.win_x64" Version="3.3.0.1" />
     <PackageReference Include="PaddleOCRSharp" Version="6.1.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <PackageReference Include="Paddle.Runtime.Win_x64" Version="3.3.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+	<Content Include="$(NuGetPackageRoot)paddleocrsharp\6.1.0\runtimes\win-x64\native\*.dll">
+      <Link>%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- 确保 PaddleOCR.dll 的核心依赖项（如 onnxruntime.dll）也被复制到输出目录 -->
+    <Content Include="$(NuGetPackageRoot)paddle.runtime.win_x64\*\runtimes\win-x64\native\*.dll">
+      <Link>%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- 确保 OpenCvSharp4 的原生 DLL 也被复制到输出目录 -->
+    <Content Include="$(NuGetPackageRoot)opencvsharp4.runtime.win\*\runtimes\win-x64\native\*.dll">
+      <Link>%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

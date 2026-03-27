@@ -1,20 +1,22 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
-using ZombieAutoClicker.Interop;
-using ZombieAutoClicker.Services;
+using ZombieAutoClicker.Core.Interfaces;
 
 namespace ZombieAutoClicker.Controllers
 {
     /// <summary>
     /// 机器人的主控大脑 (严格阶段控制：支持文字与图片混合识别)
+    /// 重构版本：使用接口依赖，实现模块分离
     /// </summary>
-    public class GameBotController
+    public class GameBotController : IGameBotController
     {
         private bool _isRunning;
         private readonly Action<string> _logCallback;
-        private readonly string _windowTitle = "向僵尸开炮";
+        private readonly IVisionService _visionService;
+        private readonly IWindowService _windowService;
+        private readonly string _windowTitle = "计算器";
 
         // ==========================================
         // 数组 1：阶段1 (进图准备阶段)
@@ -33,13 +35,28 @@ namespace ZombieAutoClicker.Controllers
         // ==========================================
         private readonly string[] _step2Texts = { "温压弹", "干冰弹", "确定", "下一层", "跳过","返回主界面" };
 
+        /// <summary>
+        /// 是否正在运行
+        /// </summary>
+        public bool IsRunning => _isRunning;
 
-        public GameBotController(Action<string> logger)
+        /// <summary>
+        /// 构造函数，通过依赖注入提供服务
+        /// </summary>
+        /// <param name="logger">日志回调</param>
+        /// <param name="visionService">视觉识别服务</param>
+        /// <param name="windowService">窗口控制服务</param>
+        public GameBotController(Action<string> logger, IVisionService visionService, IWindowService windowService)
         {
             _logCallback = logger;
+            _visionService = visionService;
+            _windowService = windowService;
             _isRunning = false;
         }
 
+        /// <summary>
+        /// 启动机器人
+        /// </summary>
         public void Start(string mode)
         {
             if (_isRunning) return;
@@ -68,6 +85,9 @@ namespace ZombieAutoClicker.Controllers
             });
         }
 
+        /// <summary>
+        /// 停止机器人
+        /// </summary>
         public void Stop()
         {
             _isRunning = false;
@@ -87,7 +107,7 @@ namespace ZombieAutoClicker.Controllers
                 loopCount++;
 
                 // 1. 获取窗口句柄
-                IntPtr hWnd = NativeMethods.FindWindow(null, _windowTitle);
+                IntPtr hWnd = _windowService.FindWindow(_windowTitle);
                 if (hWnd == IntPtr.Zero)
                 {
                     if (loopCount % 5 == 1) _logCallback($"[警告] 找不到游戏窗口 '{_windowTitle}'...");
@@ -96,7 +116,7 @@ namespace ZombieAutoClicker.Controllers
                 }
 
                 // 2. 截取当前屏幕画面
-                Bitmap screen = NativeMethods.CaptureWindow(_windowTitle, out Point winTopLeft);
+                Bitmap screen = _windowService.CaptureWindow(_windowTitle, out Point winTopLeft);
                 if (screen == null)
                 {
                     Thread.Sleep(2000);
@@ -104,7 +124,7 @@ namespace ZombieAutoClicker.Controllers
                 }
 
                 // 为了实时显示OCR结果，无论在哪个阶段，都先对整个画面进行一次文字识别
-                VisionService.FindTextCenter(screen, null);
+                _visionService.RecognizeScreen(screen);
 
                 if (isPhase1)
                 {
@@ -112,12 +132,12 @@ namespace ZombieAutoClicker.Controllers
                     // 阶段 1：严格顺序执行数组 1
                     // ==========================================
                     string target = _step1Texts[currentStep1Index];
-                    var pos = FindTargetCenter(screen, target);
+                    var pos = _visionService.FindTargetCenter(screen, target);
 
                     if (pos.HasValue)
                     {
                         _logCallback($"[阶段1-按顺序进图] 发现目标【{target}】，正在点击... ({currentStep1Index + 1}/{_step1Texts.Length})");
-                        // ClickPoint(pos.Value, winTopLeft);
+                        _windowService.ClickRelativePoint(pos.Value, winTopLeft);
 
                         // 步数+1
                         currentStep1Index++;
@@ -149,11 +169,11 @@ namespace ZombieAutoClicker.Controllers
                     bool actionTakenThisLoop = false;
                     foreach (string target in _step2Texts)
                     {
-                        var pos = FindTargetCenter(screen, target);
+                        var pos = _visionService.FindTargetCenter(screen, target);
                         if (pos.HasValue)
                         {
                             _logCallback($"[阶段2-战斗循环] 发现目标【{target}】，正在点击...");
-                            // ClickPoint(pos.Value, winTopLeft);
+                            _windowService.ClickRelativePoint(pos.Value, winTopLeft);
                             actionTakenThisLoop = true;
 
                             Thread.Sleep(1500);
@@ -163,7 +183,7 @@ namespace ZombieAutoClicker.Controllers
 
                     // 智能重置机制：如果在阶段2的循环中，游戏又回到了主界面(看到了数组1的第一个元素)
                     // 自动重置回阶段1，实现无限挂机死循环。
-                    var resetPos = FindTargetCenter(screen, _step1Texts[0]);
+                    var resetPos = _visionService.FindTargetCenter(screen, _step1Texts[0]);
                     if (resetPos.HasValue && !actionTakenThisLoop)
                     {
                         _logCallback("[系统] 检测到回到初始界面，自动重置回阶段1！");
@@ -186,31 +206,6 @@ namespace ZombieAutoClicker.Controllers
                 // 释放图片内存
                 screen.Dispose();
             }
-        }
-
-        /// <summary>
-        /// 【新增核心方法】智能目标识别分配器
-        /// 根据目标字符串的后缀，自动决定是使用 OpenCV 找图，还是 Windows OCR 找字
-        /// </summary>
-        private Point? FindTargetCenter(Bitmap screen, string target)
-        {
-            // 如果为空，说明是纯粹的屏幕全局识别（用于 UI 实时显示 OCR 框），不需要去判断后缀名
-            if (string.IsNullOrEmpty(target))
-            {
-                return VisionService.FindTextCenter(screen, null);
-            }
-
-            return VisionService.FindTextCenter(screen, target);
-        }
-
-        /// <summary>
-        /// 辅助方法：将相对截图的坐标转换为屏幕绝对坐标并点击
-        /// </summary>
-        private void ClickPoint(Point relativePoint, Point windowTopLeft)
-        {
-            int absoluteX = windowTopLeft.X + relativePoint.X;
-            int absoluteY = windowTopLeft.Y + relativePoint.Y;
-            NativeMethods.ClickAbsolute(absoluteX, absoluteY);
         }
     }
 }

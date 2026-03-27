@@ -1,0 +1,15 @@
+.git/
+.vs/
+.history/
+bin/
+obj/
+*.exe
+*.pdb
+*.dll
+*.suo
+node_modules/
+# 排除所有编译生成的临时文件
+Debug/
+Release/
+x64/
+x86/
